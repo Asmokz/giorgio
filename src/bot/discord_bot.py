@@ -187,7 +187,8 @@ def start_bot(token: SecretStr, channel_id: int):
         _bot_instance = GiorgioBot(channel_id)
         
         try:
-            _bot_loop.run_until_complete(_bot_instance.start(token))
+            token_str = str(token) if isinstance(token, SecretStr) else token
+            _bot_loop.run_until_complete(_bot_instance.start(token_str))
         except Exception as e:
             logger.error(f"❌ Giorgio crashed: {e}")
     
