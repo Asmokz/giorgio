@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  giorgio:
+    build: .
+    container_name: giorgio-bot
+    restart: unless-stopped
+    ports:
+      - "5555:5555"
+    environment:
+      - API_PORT=5555
+      - LOG_LEVEL=INFO
+      - DEBUG=False
+      - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+      - DISCORD_CHANNEL_ID=${DISCORD_CHANNEL_ID}
+      - DB_HOST=giorgio-db
+      - DB_PORT=3306
+      - DB_NAME=giorgio
+      - DB_USER=giorgio
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JELLYFIN_URL=${JELLYFIN_URL}
+      - JELLYFIN_API_KEY=${JELLYFIN_API_KEY}
+      - SYNC_INTERVAL_HOURS=6
+    depends_on:
+      giorgio-db:
+        condition: service_healthy
+    networks:
+      - giorgio-network
+
+  giorgio-db:
+    image: mariadb:10.11
+    container_name: giorgio-mariadb
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=giorgio
+      - MYSQL_USER=giorgio
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - giorgio-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - giorgio-network
+
+volumes:
+  giorgio-data:
+
+networks:
+  giorgio-network:
+    driver: bridge

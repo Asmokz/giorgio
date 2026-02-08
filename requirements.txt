@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+pydantic-settings
+discord.py
+sqlalchemy
+mariadb
+alembic
+httpx
