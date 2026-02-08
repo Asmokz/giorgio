@@ -3,6 +3,7 @@ import logging
 import asyncio
 from discord.ui import View, Button
 from discord import ButtonStyle
+from config.settings import settings, SecretStr
 
 logger = logging.getLogger(__name__)
 
@@ -169,7 +170,7 @@ _bot_instance: GiorgioBot = None
 _bot_loop: asyncio.AbstractEventLoop = None
 
 
-def start_bot(token: str, channel_id: int):
+def start_bot(token: SecretStr, channel_id: int):
     """
     Démarre Giorgio dans un thread séparé.
     Appelé au startup de FastAPI.
