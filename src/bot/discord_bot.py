@@ -180,15 +180,14 @@ def start_bot(token: SecretStr, channel_id: int):
     def run_bot():
         global _bot_instance, _bot_loop
         
-        # Crée une nouvelle event loop pour ce thread
         _bot_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(_bot_loop)
         
         _bot_instance = GiorgioBot(channel_id)
         
         try:
-            token_str = str(token) if isinstance(token, SecretStr) else token
-            _bot_loop.run_until_complete(_bot_instance.start(token_str))
+            # Utilise get_secret_value() pour obtenir le vrai token
+            _bot_loop.run_until_complete(_bot_instance.start(token.get_secret_value()))
         except Exception as e:
             logger.error(f"❌ Giorgio crashed: {e}")
     

@@ -16,7 +16,7 @@ class JellyfinSync:
     def __init__(self):
         self.base_url = settings.jellyfin_url.rstrip('/')
         self.headers = {
-            "Authorization": f"MediaBrowser Token={settings.jellyfin_api_key}",
+            "Authorization": f"MediaBrowser Token={settings.jellyfin_api_key.get_secret_value()}",
             "Content-Type": "application/json"
         }
     
