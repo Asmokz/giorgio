@@ -23,12 +23,6 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info(f"🚀 {settings.app_name} starting on port {settings.api_port}")
     
-    # DEBUG: Vérifie les tokens (affiche juste les premiers caractères)
-    jellyfin_key = settings.jellyfin_api_key.get_secret_value()
-    discord_token = settings.discord_bot_token.get_secret_value()
-    logger.info(f"🔑 Jellyfin API Key starts with: {jellyfin_key[:10]}...")
-    logger.info(f"🔑 Discord Token starts with: {discord_token[:10]}...")
-    logger.info(f"🔑 Jellyfin URL: {settings.jellyfin_url}")
     # Initialise la BDD
     init_db()
     logger.info("🗄️ Database initialized")
