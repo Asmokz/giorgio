@@ -10,6 +10,10 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+# Liste des utilisateurs qui reçoivent les notifications Discord
+DISCORD_NOTIFICATION_USERS = ["asmo"]  # Ajoute d'autres users plus tard si besoin
+
+
 async def handle_playback_stop(payload: JellyfinWebhook):
     """Traite la fin de visionnage d'un contenu"""
     if not payload.PlayedToCompletion:
@@ -24,7 +28,7 @@ async def handle_playback_stop(payload: JellyfinWebhook):
     
     logger.info(f"🎉 User {payload.NotificationUsername} finished watching {content_name}")
     
-    # Persiste les données
+    # Persiste les données pour TOUS les utilisateurs
     user = database_service.get_or_create_user(payload.UserId, payload.NotificationUsername)
     content = database_service.get_or_create_content(
         content_id=payload.ItemId,
@@ -36,15 +40,18 @@ async def handle_playback_stop(payload: JellyfinWebhook):
     )
     watchlog = database_service.create_watchlog(user.jellyfin_id, content.id)
     
-    # Envoie la demande de notation à Discord
-    await notify_rating_request(
-        user_id=payload.UserId,
-        username=payload.NotificationUsername,
-        content_id=payload.ItemId,
-        content_name=content_name,
-        content_type=payload.ItemType,
-        watchlog_id=watchlog.id
-    )
+    # Notification Discord SEULEMENT pour certains utilisateurs
+    if payload.NotificationUsername.lower() in DISCORD_NOTIFICATION_USERS:
+        await notify_rating_request(
+            user_id=payload.UserId,
+            username=payload.NotificationUsername,
+            content_id=payload.ItemId,
+            content_name=content_name,
+            content_type=payload.ItemType,
+            watchlog_id=watchlog.id
+        )
+    else:
+        logger.info(f"📊 Watchlog saved for {payload.NotificationUsername} (no Discord notification)")
 
 
 async def handle_item_added(payload: JellyfinWebhook):
